@@ -1,0 +1,9 @@
+project_id = "incubator-market"
+[auth]
+site_url = "https://zigger06.github.io/Incubator-market/"
+minimum_password_length = 8
+[auth.sms]
+enable_signup = true
+enable_confirmations = false
+[functions.contact]
+verify_jwt = false
