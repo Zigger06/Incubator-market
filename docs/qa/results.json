@@ -1,0 +1,41 @@
+{
+  "site": {
+    "expected": 37,
+    "unexpected": 0,
+    "flaky": 0,
+    "skipped": 0,
+    "duration": 48684.617
+  },
+  "forms": {
+    "expected": 4,
+    "unexpected": 0,
+    "flaky": 0,
+    "skipped": 0,
+    "duration": 3804.3779999999997
+  },
+  "screenshots": {
+    "catalog-dark-390.png": "af0be5df18d82ebb1a8bffaa537e78903971b24c02f50c889fa72cb7658914cb",
+    "catalog-light-390.png": "470b21ecf3c293f3e8d2e8da518ba29e9dbdad473c21eaa443abe6e41efd9ffb",
+    "contact-dark-390.png": "c7a411fbfd174974a312ebb96d7f66c279a26d12de06f49a6cf69288957ad668",
+    "contact-light-390.png": "c74365963a562d372a59a9afaf5a50394d88d544150ca9c023fc1989e3338fe3",
+    "contact-sheet.png": "834fc069fe611a4a23b4d5a578dde6b09a1a5abb159406ba1426f6aae9c7fd37",
+    "favorites-dark-390.png": "4be31ac2d989c35ee2f62c61b78298ef53b8ac4b31280422f52e4df0b61b0fd1",
+    "favorites-light-390.png": "877fe5a8ec3243fbb4c44b44a436322be009d040b7953e80cbf732acfd404802",
+    "home-dark-1440.png": "1f2a92e93f186400fb18981d5a97fb73c622df953683949f2ec30d9aaad4bcb4",
+    "home-dark-390.png": "591503af86658b42d4767cc2c37e5988abf19be2c1630cdb9f3f5d95e648c158",
+    "home-light-1440.png": "995a23ab785803bd058490c038c9ea8da3308d0d6e1e19a8c55b671638917328",
+    "home-light-390.png": "9c7be7761e683c610cb1ca36088fb29b5006f5fe360ded0f1eafaf3bfcce8fbf",
+    "login-dark-390.png": "d94c8ed54d6845d6e77c06416c15cf0bb9cf1f2996708aec5e9fd4a82805ab84",
+    "login-light-390.png": "5539ff7616a9e9a01c478bc25f39bdad809ceeee24a9de6db4e994f31d1da49b",
+    "one-product.png": "4d088d0cab49688fdcd5e20a7873c6074a59b9e9dba2380a6e58f572898c761f",
+    "product-dark-390.png": "6f85604f66e80028221bab16fcc8b480d9594fe131038a9ff8790bc17a475673",
+    "product-light-390.png": "2a7a5674257819e1eebc3785f5c95e6e3644ca8f98cd92f1c10ac1c43944fc4f",
+    "register-dark-390.png": "81fb5c1ba17ad134e0fa6e0bd5cfaccd8d1b4d5378d1fc1ad2287e87f841f772",
+    "register-light-390.png": "d72fb18d2d8557879fdd1a16ddd903d0035be690502a6d55a1746d1aec264e6e",
+    "two-products.png": "8ced73f472ea45c7e13057e8d40ce4d401419ff9b2789766d25e0a05ca8fcdc3"
+  },
+  "buildAssets": {
+    "index-A8eqjytj.css": "fcf2237db0f0c2357b8fc467c942d5948f6a5d3606dae8bb3d34d6fd6d49101c",
+    "index-DBAVnzg8.js": "25d62ac0f3199df31d257f50610d563fcb25cfc7404120859f8867d6888475ac"
+  }
+}

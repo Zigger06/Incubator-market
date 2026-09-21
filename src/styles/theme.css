@@ -1,0 +1,59 @@
+/* Semantic palette: components share these tokens in both themes. */
+:root {
+  color-scheme: light;
+  --bg: #f7f9fa;
+  --surface: #ffffff;
+  --surface-soft: #edf2f4;
+  --ink: #19313c;
+  --muted: #546873;
+  --border: #d4dfe4;
+  --control-border: #7d9099;
+  --navy: #102c39;
+  --on-navy: #ffffff;
+  --on-navy-muted: #c0d2db;
+  --yellow: #ffd447;
+  --on-yellow: #132e3a;
+  --accent: #0c6650;
+  --positive-bg: #e4f0eb;
+  --positive-ink: #245d3b;
+  --negative-bg: #fff0eb;
+  --negative-ink: #943e30;
+  --favorite: #b63549;
+  --whatsapp: #106345;
+  --focus: #08785b;
+  --shadow: #152e3818;
+  --backdrop: #07151cb3;
+  --hero-divider: #ffffff40;
+  --hero-overlay: #102c3966;
+  --photo-paper: #ffffff;
+}
+:root.dark {
+  color-scheme: dark;
+  --bg: #112029;
+  --surface: #192d37;
+  --surface-soft: #213944;
+  --ink: #e3eef2;
+  --muted: #afc3ce;
+  --border: #3b525e;
+  --control-border: #7f98a5;
+  --accent: #7ce0b7;
+  --positive-bg: #244338;
+  --positive-ink: #c2ebd1;
+  --negative-bg: #562e29;
+  --negative-ink: #ffd0c7;
+  --favorite: #ff9ba8;
+  --focus: #7ce0b7;
+  --shadow: #00000035;
+}
+html,
+body,
+#root {
+  min-height: 100%;
+  background: var(--bg);
+  color: var(--ink);
+}
+input::placeholder,
+textarea::placeholder {
+  color: var(--muted);
+  opacity: 1;
+}

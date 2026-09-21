@@ -18,6 +18,11 @@ Deno.serve(async (request: Request) => {
     if (input.website) return reply(200);
     const valid = (key: string, min: number, max: number) => typeof input[key] === 'string' && input[key].trim().length >= min && input[key].length <= max;
     if (!valid('name', 2, 100) || !valid('subject', 2, 150) || !valid('message', 10, 3000) || typeof input.phone !== 'string' || !/^\+992\d{9}$/.test(input.phone)) return reply(400, 'Invalid message');
+    input.preferred_channel ??= 'phone';
+    if (!['phone', 'whatsapp', 'telegram'].includes(input.preferred_channel)) return reply(400, 'Invalid channel');
+    if (input.preferred_channel === 'telegram') {
+      if (typeof input.telegram_username !== 'string' || !/^[a-zA-Z][a-zA-Z0-9_]{4,31}$/.test(input.telegram_username)) return reply(400, 'Invalid Telegram username');
+    } else input.telegram_username = '';
     const salt = Deno.env.get('CONTACT_RATE_SALT'); if (!salt) return reply(503, 'Unavailable');
     // Header is supplied by the hosting proxy. Global quota still caps abuse if IP varies.
     const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';

@@ -1,7 +1,7 @@
 import tseslint from "typescript-eslint";
 import hooks from "eslint-plugin-react-hooks";
 export default tseslint.config(
-  { ignores: ["dist/**", "node_modules/**", "supabase/functions/**"] },
+  { ignores: ["dist/**", ".ui-backend-dist/**", "test-results/**", "node_modules/**", "supabase/functions/**"] },
   ...tseslint.configs.recommended,
   {
     files: ["src/**/*.{ts,tsx}"],

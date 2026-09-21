@@ -10,12 +10,14 @@ import type { MessageKey } from "../i18n/messages";
 export default function Contact() {
   const { t, local } = useI18n();
   const { settings } = useStore();
+  const [channel, setChannel] = useState("phone");
   const [error, setError] = useState("");
   const [sent, setSent] = useState(false);
   const [busy, setBusy] = useState(false);
   async function submit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError("");
+    setSent(false);
     const form = e.currentTarget;
     const result = contactSchema.safeParse(
       Object.fromEntries(new FormData(form)),
@@ -29,6 +31,7 @@ export default function Contact() {
       await sendContact(result.data);
       setSent(true);
       form.reset();
+      setChannel("phone");
     } catch {
       setError("genericError");
     } finally {
@@ -51,12 +54,13 @@ export default function Contact() {
           <p>{settings.hours}</p>
           <ContactLinks />
         </div>
-        <form className="panel" onSubmit={submit}>
+        <form className="panel" onSubmit={submit} aria-busy={busy}>
           <h2>{t("write")}</h2>
           <div className="two-fields">
             <label>
               {t("name")}
               <input
+                disabled={busy}
                 name="name"
                 autoComplete="name"
                 required
@@ -67,6 +71,7 @@ export default function Contact() {
             <label>
               {t("phone")}
               <input
+                disabled={busy}
                 name="phone"
                 type="tel"
                 autoComplete="tel"
@@ -75,13 +80,49 @@ export default function Contact() {
               />
             </label>
           </div>
+          <input type="hidden" name="subject" value={t("consult")} />
           <label>
-            {t("subject")}
-            <input name="subject" required minLength={2} maxLength={150} />
+            {t("preferredChannel")}
+            <select
+              disabled={busy}
+              name="preferred_channel"
+              value={channel}
+              onChange={(e) => {
+                setChannel(e.target.value);
+                setError("");
+              }}
+            >
+              <option value="phone">{t("phoneCall")}</option>
+              <option value="whatsapp">WhatsApp</option>
+              <option value="telegram">Telegram</option>
+            </select>
           </label>
+          {channel === "telegram" && (
+            <label>
+              {t("telegramUsername")}
+              <input
+                disabled={busy}
+                name="telegram_username"
+                placeholder="@username"
+                required
+                minLength={5}
+                maxLength={33}
+                aria-invalid={error === "telegramError"}
+                autoComplete="off"
+                autoCapitalize="none"
+                spellCheck={false}
+              />
+            </label>
+          )}
           <label>
             {t("message")}
-            <textarea name="message" required minLength={10} maxLength={3000} />
+            <textarea
+              disabled={busy}
+              name="message"
+              required
+              minLength={10}
+              maxLength={3000}
+            />
           </label>
           <div className="honeypot" aria-hidden="true">
             <label>
@@ -96,14 +137,19 @@ export default function Contact() {
             text={
               error
                 ? t(
-                    (["required", "phoneError", "messageError"].includes(error)
+                    ([
+                      "required",
+                      "phoneError",
+                      "messageError",
+                      "telegramError",
+                    ].includes(error)
                       ? error
                       : "genericError") as MessageKey,
                   )
                 : ""
             }
           />
-          {isDemo && <Notice text={t("unavailable")} />}
+          {isDemo && <p className="form-note">{t("unavailable")}</p>}
           <button className="button primary" disabled={busy || isDemo}>
             {t(busy ? "loading" : "send")}
           </button>

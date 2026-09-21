@@ -1,0 +1,125 @@
+.contact-trigger {
+  position: fixed;
+  right: max(24px, env(safe-area-inset-right));
+  bottom: max(24px, env(safe-area-inset-bottom));
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  width: 52px;
+  padding: 0;
+  justify-content: center;
+  min-height: 52px;
+  z-index: 40;
+  background: var(--yellow);
+  color: var(--on-yellow);
+  border: 1px solid var(--on-yellow);
+  box-shadow: 0 5px 24px var(--shadow);
+  border-radius: 28px;
+  font-size: 14px;
+}
+.contact-trigger > span {
+  position: absolute;
+  right: 64px;
+  white-space: nowrap;
+  padding: 9px 14px;
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--border);
+  box-shadow: 0 5px 24px var(--shadow);
+  opacity: 0;
+  pointer-events: none;
+}
+.contact-trigger:hover > span,
+.contact-trigger:focus-visible > span {
+  opacity: 1;
+}
+.contact-dialog {
+  padding: 0;
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  width: min(460px, calc(100% - 32px));
+  max-height: calc(100dvh - 48px);
+  box-shadow: 0 16px 60px var(--shadow);
+}
+.contact-dialog::backdrop {
+  background: var(--backdrop);
+}
+.contact-dialog-body {
+  padding: 28px;
+}
+.contact-dialog .section-heading {
+  align-items: flex-start;
+  gap: 12px;
+}
+.contact-dialog h2 {
+  font-size: 27px;
+}
+.contact-dialog .icon {
+  flex-shrink: 0;
+}
+.contact-dialog .actions {
+  display: grid;
+  grid-template-columns: 1fr;
+}
+.contact-dialog .actions > * {
+  width: 100%;
+  justify-content: flex-start;
+}
+.contact-product {
+  background: var(--surface-soft);
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 14px;
+}
+.channel-unavailable {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  border-radius: 8px;
+  padding: 10px 16px;
+  font-size: 14px;
+}
+.channel-unavailable small {
+  display: block;
+  font-size: 12px;
+  font-weight: 400;
+}
+.contact-links {
+  margin: 20px 0;
+}
+.specialist-link {
+  margin-top: 12px;
+  width: 100%;
+  justify-content: space-between;
+}
+footer {
+  padding-bottom: 80px;
+}
+@media (max-width: 760px) {
+  .contact-trigger {
+    width: 52px;
+    padding: 0;
+    justify-content: center;
+    right: 16px;
+    bottom: max(16px, env(safe-area-inset-bottom));
+  }
+  .contact-trigger > span {
+    display: none;
+  }
+  .contact-dialog {
+    width: 100%;
+    max-width: none;
+    max-height: calc(100dvh - 24px);
+    margin: auto 0 0;
+    border-radius: 20px 20px 0 0;
+    border-bottom: 0;
+  }
+  .contact-dialog-body {
+    padding: 24px 20px max(24px, env(safe-area-inset-bottom));
+  }
+}

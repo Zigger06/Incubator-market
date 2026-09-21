@@ -6,6 +6,7 @@ import { I18nProvider } from "./i18n/Provider";
 import { AuthProvider } from "./features/auth/AuthProvider";
 import { StoreProvider } from "./app/StoreProvider";
 import "./styles/index.css";
+import { ContactProvider } from "./features/contact/ContactProvider";
 class ErrorBoundary extends React.Component<
   { children: React.ReactNode },
   { failed: boolean }
@@ -34,7 +35,9 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
         <HashRouter>
           <AuthProvider>
             <StoreProvider>
-              <App />
+              <ContactProvider>
+                <App />
+              </ContactProvider>
             </StoreProvider>
           </AuthProvider>
         </HashRouter>

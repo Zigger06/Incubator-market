@@ -15,8 +15,8 @@ import type { MessageKey } from "../i18n/messages";
 export default function Auth() {
   const { t } = useI18n();
   const { user, loading } = useAuth();
-  const [params] = useSearchParams();
-  const [register, setRegister] = useState(false);
+  const [params, setParams] = useSearchParams();
+  const register = params.get("mode") === "register";
   const [show, setShow] = useState(false);
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
@@ -64,7 +64,9 @@ export default function Auth() {
       if (result.error) throw result.error;
       if (register && !result.data.session) setNeedsOtp(true);
     } catch {
-      setError("authError");
+      setError(
+        needsOtp ? "otpError" : register ? "registerError" : "authError",
+      );
     } finally {
       setBusy(false);
     }
@@ -79,16 +81,18 @@ export default function Auth() {
           {t("continue")}
         </Link>
       </div>
-      <form className="panel" onSubmit={submit}>
+      <form className="panel" onSubmit={submit} aria-busy={busy}>
         <h2>{t(needsOtp ? "verifyPhone" : register ? "register" : "login")}</h2>
         {!needsOtp ? (
           <>
             <label>
               {t("phone")}
               <input
+                disabled={busy}
                 required
                 type="tel"
                 autoComplete="tel"
+                aria-invalid={error === "phoneError"}
                 value={phone}
                 onBlur={() => setPhone(formatPhone(phone))}
                 onChange={(e) => setPhone(e.target.value)}
@@ -98,11 +102,15 @@ export default function Auth() {
             <label>
               {t("password")}
               <input
+                disabled={busy}
                 required
                 autoComplete={register ? "new-password" : "current-password"}
                 type={show ? "text" : "password"}
                 minLength={8}
                 maxLength={128}
+                aria-invalid={
+                  error === "passwordError" || error === "authError"
+                }
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
@@ -111,9 +119,13 @@ export default function Auth() {
               <label>
                 {t("confirm")}
                 <input
+                  disabled={busy}
                   required
                   autoComplete="new-password"
                   type={show ? "text" : "password"}
+                  minLength={8}
+                  maxLength={128}
+                  aria-invalid={error === "passwordMatch"}
                   value={confirm}
                   onChange={(e) => setConfirm(e.target.value)}
                 />
@@ -121,6 +133,7 @@ export default function Auth() {
             )}
             <label className="checkbox">
               <input
+                disabled={busy}
                 type="checkbox"
                 checked={show}
                 onChange={(e) => setShow(e.target.checked)}
@@ -132,6 +145,7 @@ export default function Auth() {
           <label>
             {t("otp")}
             <input
+              disabled={busy}
               inputMode="numeric"
               autoComplete="one-time-code"
               pattern="[0-9]{6}"
@@ -149,16 +163,24 @@ export default function Auth() {
               : needsOtp
                 ? "verify"
                 : register
-                  ? "register"
+                  ? "registerAction"
                   : "login",
           )}
         </button>
-        {!supabase && <Notice text={t("unavailable")} />}
+        {!supabase && <p className="form-note">{t("authUnavailable")}</p>}
         <button
           type="button"
+          disabled={busy}
           className="text-button"
           onClick={() => {
-            setRegister(!register);
+            const nextParams = new URLSearchParams(params);
+            if (register) nextParams.delete("mode");
+            else nextParams.set("mode", "register");
+            setParams(nextParams);
+            setConfirm("");
+            setPassword("");
+            setShow(false);
+            setOtp("");
             setError("");
             setNeedsOtp(false);
           }}

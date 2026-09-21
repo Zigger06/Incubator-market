@@ -38,10 +38,36 @@ export const checkoutSchema = z
     message: "required",
     path: ["address"],
   });
-export const contactSchema = z.object({
-  name: z.string().trim().min(2, "required").max(100),
-  phone: phoneSchema,
-  subject: z.string().trim().min(2, "required").max(150),
-  message: z.string().trim().min(10, "messageError").max(3000),
-  website: z.string().max(0),
-});
+export const contactSchema = z
+  .object({
+    preferred_channel: z
+      .enum(["phone", "whatsapp", "telegram"])
+      .default("phone"),
+    telegram_username: z
+      .string()
+      .trim()
+      .transform((v) => v.replace(/^@/, ""))
+      .default(""),
+    name: z.string().trim().min(2, "required").max(100),
+    phone: phoneSchema,
+    subject: z.string().trim().min(2, "required").max(150),
+    message: z.string().trim().min(10, "messageError").max(3000),
+    website: z.string().max(0),
+  })
+  .superRefine((data, ctx) => {
+    if (
+      data.preferred_channel === "telegram" &&
+      !/^[a-zA-Z][a-zA-Z0-9_]{4,31}$/.test(data.telegram_username)
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["telegram_username"],
+        message: "telegramError",
+      });
+    }
+  })
+  .transform((data) => ({
+    ...data,
+    telegram_username:
+      data.preferred_channel === "telegram" ? data.telegram_username : "",
+  }));

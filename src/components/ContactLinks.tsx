@@ -1,40 +1,74 @@
+import { Link } from "react-router-dom";
 import { useStore } from "../app/StoreProvider";
 import { useI18n } from "../i18n/Provider";
-import { MessageCircle, Send, Phone } from "lucide-react";
-export function ContactLinks({ message = "" }: { message?: string }) {
+import { MessageCircle, Send, Phone, ArrowUpRight } from "lucide-react";
+import {
+  consultationMessage,
+  contactLinks,
+  type ProductContact,
+} from "../features/contact/links";
+export function ContactLinks({
+  product,
+  specialist = false,
+  onNavigate,
+}: {
+  product?: ProductContact | null;
+  specialist?: boolean;
+  onNavigate?: () => void;
+}) {
   const { settings } = useStore();
-  const { t } = useI18n();
-  const wa = settings.whatsapp.replace(/\D/g, "");
-  const tg = settings.telegram.replace(/^@/, "");
+  const { t, locale } = useI18n();
+  const links = contactLinks(settings, consultationMessage(locale, product));
   return (
-    <div className="actions">
-      {/^992\d{9}$/.test(wa) && (
-        <a
-          className="button whatsapp"
-          href={`https://wa.me/${wa}?text=${encodeURIComponent(message)}`}
-          target="_blank"
-          rel="noopener noreferrer"
+    <div className="contact-links">
+      <div className="actions">
+        {(
+          [
+            ["whatsapp", "WhatsApp", MessageCircle],
+            ["telegram", "Telegram", Send],
+            ["phone", t("phoneCall"), Phone],
+          ] as const
+        ).map(([key, label, Icon]) =>
+          links[key] ? (
+            <a
+              key={key}
+              className={`button ${key === "whatsapp" ? "whatsapp" : "secondary"}`}
+              href={links[key]!}
+              target={key === "phone" ? undefined : "_blank"}
+              rel="noopener noreferrer"
+            >
+              <Icon size={18} />
+              {label}
+            </a>
+          ) : (
+            key !== "phone" && (
+              <span
+                key={key}
+                className="channel-unavailable"
+                aria-disabled="true"
+              >
+                <Icon size={18} />
+                <span>
+                  {label}
+                  <small>{t("channelUnavailable")}</small>
+                </span>
+              </span>
+            )
+          ),
+        )}
+      </div>
+      {specialist && (
+        <Link
+          className="button secondary specialist-link"
+          to="/contact"
+          onClick={onNavigate}
         >
-          <MessageCircle size={18} />
-          WhatsApp
-        </a>
+          {t("writeSpecialist")}
+          <ArrowUpRight size={18} />
+        </Link>
       )}
-      {/^[a-zA-Z0-9_]{5,32}$/.test(tg) && (
-        <a
-          className="button secondary"
-          href={`https://t.me/${tg}`}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Send size={18} />
-          Telegram
-        </a>
-      )}
-      {/^\+992\d{9}$/.test(settings.phone) && (
-        <a className="button secondary" href={"tel:" + settings.phone}>
-          <Phone size={18} />
-          {t("phone")}
-        </a>
+      {!links.whatsapp && !links.telegram && !links.phone && (
+        <p className="form-note">{t("contactSetupNote")}</p>
       )}
     </div>
   );

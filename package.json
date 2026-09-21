@@ -10,7 +10,9 @@
     "preview": "vite preview",
     "lint": "eslint .",
     "test": "vitest run",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test:ui": "playwright test",
+    "test:ui:forms": "VITE_SUPABASE_URL=https://test.supabase.co VITE_SUPABASE_PUBLISHABLE_KEY=sb_publishable_test vite build --outDir .ui-backend-dist && UI_BACKEND=1 UI_DIST_DIR=.ui-backend-dist playwright test"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.57.0",
@@ -22,6 +24,7 @@
   },
   "devDependencies": {
     "@electric-sql/pglite": "^0.5.8",
+    "@playwright/test": "^1.63.0",
     "@types/node": "^22.10.0",
     "@types/react": "^18.2.43",
     "@types/react-dom": "^18.2.17",

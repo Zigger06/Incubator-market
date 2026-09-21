@@ -17,6 +17,7 @@ import { useStore } from "../app/StoreProvider";
 import { isDemo } from "../lib/supabase";
 import { readLocal, writeLocal } from "../lib/storage";
 import type { MessageKey } from "../i18n/messages";
+import { ContactWidget } from "../features/contact/ContactWidget";
 export function Layout() {
   const { t, locale, setLocale, local } = useI18n();
   const { settings, cart, notice } = useStore();
@@ -45,15 +46,22 @@ export function Layout() {
   const links: [string, MessageKey][] = [
     ["/", "home"],
     ["/catalog", "catalog"],
-    ["/categories", "categories"],
     ["/about", "about"],
     ["/delivery", "delivery"],
+    ["/warranty", "warranty"],
     ["/contact", "contact"],
   ];
   return (
     <>
-      <a className="skip" href="#main">
-        {t("catalog")}
+      <a
+        className="skip"
+        href="#main"
+        onClick={(event) => {
+          event.preventDefault();
+          document.getElementById("main")?.focus();
+        }}
+      >
+        {t("skipContent")}
       </a>
       <div className="topbar">
         <div className="container">
@@ -139,7 +147,7 @@ export function Layout() {
           {t("offline")}
         </div>
       )}
-      <main id="main" className="container">
+      <main id="main" className="container" tabIndex={-1}>
         <Outlet />
       </main>
       <footer>
@@ -195,6 +203,7 @@ export function Layout() {
           <span>Тоҷикистон</span>
         </div>
       </footer>
+      <ContactWidget />
       {notice && (
         <div className="toast" role="status">
           {t(notice as MessageKey)}

@@ -1,5 +1,5 @@
 import { PGlite } from "@electric-sql/pglite";
-import { readFileSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
 import { beforeAll, afterAll, it, expect } from "vitest";
 let db: PGlite;
 const buyer = "30000000-0000-4000-8000-000000000001";
@@ -47,11 +47,16 @@ beforeAll(async () => {
     `create role anon;create role authenticated;create role service_role;create schema auth;create table auth.users(id uuid primary key,phone text);create function auth.uid() returns uuid language sql stable as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$;grant usage on schema auth to anon,authenticated;grant execute on function auth.uid() to anon,authenticated;create schema storage;create table storage.buckets(id text primary key,name text,public boolean,file_size_limit bigint,allowed_mime_types text[]);create table storage.objects(id uuid primary key,bucket_id text);alter table storage.objects enable row level security;`,
   );
   // PGlite uses PostgreSQL builtin gen_random_uuid; pgcrypto package isn't needed by this schema.
-  const migration = readFileSync(
-    "supabase/migrations/202609200001_store.sql",
-    "utf8",
-  ).replace("create extension if not exists pgcrypto;", "");
-  await db.exec(migration);
+  for (const name of readdirSync("supabase/migrations")
+    .filter((n) => n.endsWith(".sql"))
+    .sort()) {
+    await db.exec(
+      readFileSync(`supabase/migrations/${name}`, "utf8").replace(
+        "create extension if not exists pgcrypto;",
+        "",
+      ),
+    );
+  }
   await db.query(
     "insert into auth.users(id,phone) values($1,$4),($2,$4),($3,$4)",
     [buyer, other, admin, "992901234567"],
@@ -266,4 +271,55 @@ it("service contact submissions are rate limited and unreadable to public", asyn
   expect(
     (await db.query("select * from public.contact_messages")).rows,
   ).toHaveLength(5);
+});
+
+it("stores Telegram callback preferences through the service-only RPC", async () => {
+  await db.exec("reset role; truncate private.contact_limits");
+  await as("service_role", null);
+  await db.query("select public.submit_contact($1,$2::jsonb)", [
+    "b".repeat(64),
+    JSON.stringify({
+      name: "Test User",
+      phone: "+992901234567",
+      subject: "Help",
+      message: "Please help choose a model",
+      preferred_channel: "telegram",
+      telegram_username: "test_user",
+    }),
+  ]);
+  await db.exec("reset role");
+  const result = await db.query<{
+    preferred_channel: string;
+    telegram_username: string;
+  }>(
+    "select preferred_channel,telegram_username from public.contact_messages where telegram_username='test_user'",
+  );
+  expect(result.rows[0]).toEqual({
+    preferred_channel: "telegram",
+    telegram_username: "test_user",
+  });
+});
+it("rejects invalid contact preferences at the database boundary", async () => {
+  await db.exec("reset role; truncate private.contact_limits");
+  await as("service_role", null);
+  for (const preference of [
+    { preferred_channel: "telegram", telegram_username: "" },
+    { preferred_channel: "unknown" },
+  ]) {
+    await expect(
+      db.query("select public.submit_contact($1,$2::jsonb)", [
+        "c".repeat(64),
+        JSON.stringify({
+          name: "Test User",
+          phone: "+992901234567",
+          subject: "Help",
+          message: "Please help choose a model",
+          ...preference,
+        }),
+      ]),
+    ).rejects.toThrow();
+  }
+  await expect(
+    db.query("select public.submit_contact(null,'{}'::jsonb)"),
+  ).rejects.toThrow("invalid key");
 });

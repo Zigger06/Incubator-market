@@ -3,6 +3,16 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <script>
+      try {
+        document.documentElement.classList.toggle(
+          "dark",
+          JSON.parse(localStorage.getItem("im:dark") || "false") === true,
+        );
+      } catch {
+        /* Storage may be unavailable. */
+      }
+    </script>
     <meta name="theme-color" content="#102c39" />
     <meta
       name="description"

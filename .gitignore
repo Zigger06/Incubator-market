@@ -8,3 +8,7 @@ dist/
 .sites-runtime/
 .openai/
 coverage/
+
+test-results/
+playwright-report/
+.ui-backend-dist/

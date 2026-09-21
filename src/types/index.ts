@@ -81,6 +81,8 @@ export interface Order {
   order_items: OrderItem[];
 }
 export interface ContactMessage {
+  preferred_channel: "phone" | "whatsapp" | "telegram";
+  telegram_username: string;
   id: string;
   name: string;
   phone: string;

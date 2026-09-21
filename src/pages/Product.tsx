@@ -7,12 +7,14 @@ import { ProductCard, ProductPhoto } from "../components/ProductCard";
 import { CatalogStatus } from "../components/Status";
 import { ContactLinks } from "../components/ContactLinks";
 import { featureLabels } from "../config/site";
+import { useContact } from "../features/contact/ContactProvider";
 export default function ProductPage() {
   const { slug } = useParams();
   const { products, loading, error, add, favorites, toggleFavorite } =
     useStore();
   const { t, local, money } = useI18n();
   const navigate = useNavigate();
+  const { setProduct } = useContact();
   const [quantity, setQuantity] = useState(1);
   const [variant, setVariant] = useState("");
   const [image, setImage] = useState("");
@@ -25,6 +27,22 @@ export default function ProductPage() {
   useEffect(() => {
     if (p) document.title = local(p.name) + " — Incubator Market";
   }, [p, local]);
+  const v = p?.product_variants.find((v) => v.id === variant);
+  useEffect(() => {
+    setProduct(
+      p
+        ? {
+            name: local(p.name),
+            capacity: p.capacity,
+            price: money(v?.price_minor ?? p.price_minor),
+            url: window.location.href,
+            variant: v ? local(v.name) : undefined,
+            quantity,
+          }
+        : null,
+    );
+    return () => setProduct(null);
+  }, [p, v, local, money, quantity, setProduct]);
   if (loading || error) return <CatalogStatus />;
   if (!p)
     return (
@@ -33,15 +51,15 @@ export default function ProductPage() {
         <Link to="/catalog">{t("catalog")}</Link>
       </div>
     );
-  const v = p.product_variants.find((v) => v.id === variant);
   const stock = v?.stock ?? p.stock;
-  const msg =
-    local(p.name) +
-    (v ? " / " + local(v.name) : "") +
-    " × " +
-    quantity +
-    "\n" +
-    window.location.href;
+  const contactProduct = {
+    name: local(p.name),
+    capacity: p.capacity,
+    price: money(v?.price_minor ?? p.price_minor),
+    url: window.location.href,
+    variant: v ? local(v.name) : undefined,
+    quantity,
+  };
   return (
     <div className="page">
       <Link className="text-link" to="/catalog">
@@ -154,7 +172,7 @@ export default function ProductPage() {
           >
             {t("buy")}
           </button>
-          <ContactLinks message={msg} />
+          <ContactLinks product={contactProduct} specialist />
           <p className="muted">
             {t("warrantyText")} {t("deliveryText")}
           </p>

@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { useSearchParams } from "react-router-dom";
-import { Search, SlidersHorizontal, Grid2X2, List } from "lucide-react";
+import { Link, useSearchParams } from "react-router-dom";
+import { Search, SlidersHorizontal, Grid2X2, List, Heart } from "lucide-react";
 import { useI18n } from "../i18n/Provider";
 import { useStore } from "../app/StoreProvider";
 import { featureLabels } from "../config/site";
@@ -11,7 +11,7 @@ export default function Catalog({
 }: {
   favoritesOnly?: boolean;
 }) {
-  const { t, local } = useI18n();
+  const { t, local, locale } = useI18n();
   const { products, categories, favorites, loading, error } = useStore();
   const [params, setParams] = useSearchParams();
   const [limit, setLimit] = useState(12);
@@ -52,6 +52,24 @@ export default function Catalog({
           ? b.price_minor - a.price_minor
           : Number(b.featured) - Number(a.featured),
     );
+  if (favoritesOnly && !loading && !error && favorites.length === 0)
+    return (
+      <div className="page">
+        <div className="page-title">
+          <h1>{t("favorites")}</h1>
+        </div>
+        <div className="empty empty-state">
+          <Heart size={42} />
+          <h2>{t("emptyFavorites")}</h2>
+          <p>{t("emptyFavoritesHint")}</p>
+          <Link className="button primary" to="/catalog">
+            {t("continue")}
+          </Link>
+        </div>
+      </div>
+    );
+  const countLabel =
+    locale === "ru" ? new Intl.PluralRules("ru").select(rows.length) : "other";
   return (
     <div className="page">
       <div className="page-title">
@@ -67,7 +85,9 @@ export default function Catalog({
           onChange={(e) => set("q", e.target.value)}
         />
         <button
-          className="icon"
+          className="icon filter-toggle"
+          aria-expanded={filters}
+          aria-controls="catalog-filters"
           aria-label={t("filters")}
           onClick={() => setFilters(!filters)}
         >
@@ -75,7 +95,10 @@ export default function Catalog({
         </button>
       </div>
       <div className="catalog-layout">
-        <aside className={"filters " + (filters ? "expanded" : "")}>
+        <aside
+          id="catalog-filters"
+          className={"filters " + (filters ? "expanded" : "")}
+        >
           <div className="section-heading">
             <h3>{t("filters")}</h3>
             <button
@@ -180,7 +203,14 @@ export default function Catalog({
         <div>
           <div className="catalog-toolbar">
             <span>
-              {rows.length} {t("results")}
+              {rows.length}{" "}
+              {t(
+                countLabel === "one"
+                  ? "resultOne"
+                  : countLabel === "few"
+                    ? "resultFew"
+                    : "results",
+              )}
             </span>
             <div className="actions">
               <select
@@ -203,20 +233,45 @@ export default function Catalog({
           </div>
           <CatalogStatus />
           {!loading && !error && !rows.length && (
-            <div className="empty">
-              <h2>{t(favoritesOnly ? "emptyFavorites" : "emptyResults")}</h2>
+            <div className="empty empty-state">
+              <Search size={40} />
+              <h2>
+                {t(favoritesOnly ? "emptyFavoritesFiltered" : "emptyResults")}
+              </h2>
               <p>{t("emptyHint")}</p>
+              <button
+                className="button secondary"
+                onClick={() => setParams({})}
+              >
+                {t("reset")}
+              </button>
             </div>
           )}
           <div
             className={
-              "product-grid catalog-products " + (list ? "list-view" : "")
+              "product-grid catalog-products " +
+              (list
+                ? "list-view"
+                : rows.length === 1
+                  ? "single-result"
+                  : rows.length === 2
+                    ? "sparse-results"
+                    : "")
             }
           >
             {rows.slice(0, limit).map((p) => (
               <ProductCard key={p.id} product={p} />
             ))}
           </div>
+          {!loading && !error && rows.length > 0 && rows.length <= 2 && (
+            <aside className="catalog-help">
+              <h2>{t("support")}</h2>
+              <p>{t("supportText")}</p>
+              <Link className="text-link" to="/contact">
+                {t("consult")}
+              </Link>
+            </aside>
+          )}
           {rows.length > limit && (
             <button
               className="button secondary load-more"

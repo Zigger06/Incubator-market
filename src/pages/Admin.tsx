@@ -299,6 +299,14 @@ export default function Admin() {
             <p>
               {m.name} · {m.phone}
             </p>
+            <p>
+              {t("preferredChannel")}:{" "}
+              {m.preferred_channel === "telegram"
+                ? `Telegram · @${m.telegram_username}`
+                : m.preferred_channel === "whatsapp"
+                  ? "WhatsApp"
+                  : t("phoneCall")}
+            </p>
             <p className="prewrap">{m.message}</p>
           </article>
         ))}
